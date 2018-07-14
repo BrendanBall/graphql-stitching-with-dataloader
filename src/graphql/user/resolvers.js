@@ -1,4 +1,5 @@
 import User from '../../models/user'
+import { print } from 'graphql'
 
 export async function users (obj, args, { knex }, info) {
   return User.query(knex)
@@ -10,7 +11,7 @@ export async function userById (obj, { id }, { knex }, info) {
 }
 
 export async function usersByIds (obj, { ids }, { knex }, info) {
-  console.log('usersByIds for: ', ids)
+  console.log('in query: ', print(info.fieldNodes[0]).replace(/\s+/g, ' '), '-- ids:', ids)
   return User.query(knex).findByIds(ids).throwIfNotFound()
 }
 

@@ -13,6 +13,7 @@
     "dataloader": "^1.4.0",
     "express": "^4.16.3",
     "graphql": "^0.13.2",
+    "graphql-binding": "^2.1.1",
     "graphql-playground-middleware-express": "^1.6.1",
     "graphql-tools": "^3.0.0",
     "knex": "^0.15.0",
