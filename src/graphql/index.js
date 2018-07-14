@@ -54,7 +54,7 @@ const ticketCreatedBy = {
 const ticketAssignedTo = {
   fragment: `... on Ticket { assignedToUserId }`,
   async resolve (ticket, args, { loaders: { user } }, info) {
-    return user.load(ticket.createdByUserId, info.fieldNodes[0].selectionSet)
+    return user.load(ticket.assignedToUserId, info.fieldNodes[0].selectionSet)
   }
 }
 
