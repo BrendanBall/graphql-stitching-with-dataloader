@@ -1,32 +1,60 @@
 import { mergeSchemas } from 'graphql-tools'
 import { ticketSchema, ticketLoaders } from './ticket'
 import { tagSchema } from './tag'
-import { userSchema, userLoaders } from './user'
+import { userSchema } from './user'
 import { Binding } from 'graphql-binding'
 import DataLoader from 'dataloader'
-import { print } from 'graphql'
 import { print as printSelectionSet } from './printer'
 
 const linkTypeDefs = `
   extend type Ticket {
     tags: [Tag!]!
     createdBy: User!
+    assignedTo: User
   }
 `
 
 const userBinding = new Binding({ schema: userSchema })
 
-const userLoader = new DataLoader(async ids => {
-  let resp = await userBinding.query.usersByIds({ ids: ids.map(obj => obj.id) }, printSelectionSet(ids[0].selectionSet))
-  console.log('userBinding resp: ', resp)
-  return resp
-})
+class FancyDataLoader {
+  constructor (batchLoadFn) {
+    this.batchLoadFn = batchLoadFn
+    this.loaders = {}
+  }
+
+  async load (id, selectionSet) {
+    if (!id) {
+      return null
+    }
+    let hash = printSelectionSet(selectionSet)
+    let loader = this.loaders[hash]
+    if (!loader) {
+      this.loaders[hash] = new DataLoader(ids => this.batchLoadFn(ids, selectionSet))
+    }
+    return this.loaders[hash].load(id)
+  }
+}
+
+function userLoader () {
+  return new FancyDataLoader(async (ids, selectionSet) => {
+    console.log('user loader : ', printSelectionSet(selectionSet), '-- ids: ', ids)
+    let resp = await userBinding.query.usersByIds({ ids }, printSelectionSet(selectionSet))
+    console.log('userBinding resp: ', resp)
+    return resp
+  })
+}
 
 const ticketCreatedBy = {
   fragment: `... on Ticket { createdByUserId }`,
-  resolve (ticket, args, context, info) {
-    console.log('out query: ', print(info.fieldNodes[0]).replace(/\s+/g, ' '), '-- createdByUserId: ', ticket.createdByUserId)
-    return userLoader.load({ id: ticket.createdByUserId, selectionSet: info.fieldNodes[0].selectionSet })
+  async resolve (ticket, args, { loaders: { user } }, info) {
+    return user.load(ticket.createdByUserId, info.fieldNodes[0].selectionSet)
+  }
+}
+
+const ticketAssignedTo = {
+  fragment: `... on Ticket { assignedToUserId }`,
+  async resolve (ticket, args, { loaders: { user } }, info) {
+    return user.load(ticket.createdByUserId, info.fieldNodes[0].selectionSet)
   }
 }
 
@@ -50,7 +78,8 @@ export function createSchema () {
             })
           }
         },
-        createdBy: ticketCreatedBy
+        createdBy: ticketCreatedBy,
+        assignedTo: ticketAssignedTo
       }
 
     }
@@ -58,5 +87,5 @@ export function createSchema () {
 }
 
 export function createLoaders (knex) {
-  return { ...ticketLoaders(knex), ...userLoaders(knex) }
+  return { ...ticketLoaders(knex), user: userLoader() }
 }

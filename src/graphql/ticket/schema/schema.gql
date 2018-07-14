@@ -24,5 +24,6 @@ input TicketInput {
     title: String!
     description: String!
     createdByUserId: ID!
+    assignedToUserId: ID
     tagIds: [ID!]
 }
