@@ -1,5 +1,7 @@
 type Query {
     tags: [Tag!]!
+    tagById(id: ID!): Tag
+    tagsByIds(ids: [ID!]!): [Tag!]!
 }
 
 type Mutation {

@@ -1,13 +1,10 @@
 type Query {
     tickets: [Ticket!]!
-    users: [User!]!
 }
 
 type Mutation {
     createTicket(input: TicketInput!): Ticket
     updateTicket(id: ID!, input: TicketInput!): Ticket
-    createUser(input: UserInput!): User
-    updateUser(id: ID!, input: UserInput!): User
 }
 
 scalar DateTime
@@ -18,8 +15,8 @@ type Ticket {
     description: String
     createdAt: DateTime!
     modifiedAt: DateTime
-    createdBy: User!
-    assignedTo: User
+    createdByUserId: ID!
+    assignedToUserId: ID
     tagIds: [ID!]!
 }
 
@@ -28,15 +25,4 @@ input TicketInput {
     description: String!
     createdByUserId: ID!
     tagIds: [ID!]
-}
-
-type User {
-    id: ID!
-    username: String
-    name: String
-}
-
-input UserInput {
-    username: String
-    name: String
 }

@@ -1,16 +1,12 @@
 import { tickets, createTicket, updateTicket, TicketResolver as Ticket } from './ticket'
-import { users, createUser, updateUser } from './user'
 
 export default {
   Query: {
-    tickets,
-    users
+    tickets
   },
   Mutation: {
     createTicket,
-    updateTicket,
-    createUser,
-    updateUser
+    updateTicket
   },
   Ticket
 }

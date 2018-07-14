@@ -15,9 +15,6 @@ export async function updateTicket (obj, { id, input }, { knex }, info) {
 }
 
 export const TicketResolver = {
-  async createdBy (ticket, args, { loaders: { users } }, info) {
-    return users.load(ticket.createdByUserId)
-  },
   async tagIds (ticket, args, { loaders: { ticketTagIds } }, info) {
     return ticketTagIds.load(ticket.id)
   }
