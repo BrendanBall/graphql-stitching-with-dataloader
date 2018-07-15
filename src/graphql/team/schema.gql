@@ -1,0 +1,21 @@
+type Query {
+    teams: [Team!]!
+    teamById(id: Int!): Team
+    teamsByUserIds(userIds: [Int!]!): [Team!]!
+    teamsByIds(ids: [Int!]!): [Team!]!
+}
+
+type Mutation {
+    createTeam(input: TeamInput!): Team
+    updateTeam(id: Int!, input: TeamInput!): Team
+}
+
+type Team {
+    id: Int!
+    name: String
+    userIds: [Int!]
+}
+
+input TeamInput {
+    name: String
+}

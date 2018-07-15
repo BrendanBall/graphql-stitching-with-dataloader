@@ -12,7 +12,8 @@ export async function userById (obj, { id }, { knex }, info) {
 
 export async function usersByIds (obj, { ids }, { knex }, info) {
   console.log('in query: ', print(info.fieldNodes[0]).replace(/\s+/g, ' '), '-- ids:', ids)
-  return User.query(knex).findByIds(ids).throwIfNotFound()
+  let users = await User.query(knex).findByIds(ids).throwIfNotFound()
+  return ids.map(id => users.find(u => u.id === id))
 }
 
 export async function createUser (obj, { input }, { knex }, info) {

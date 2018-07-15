@@ -29,6 +29,16 @@ exports.up = knex => {
       table.string('name').unique()
       table.string('description')
     })
+    .createTable('team', table => {
+      table.increments('id').primary()
+      table.string('name')
+    })
+    .createTable('teamUser', table => {
+      table.integer('teamId')
+      table.integer('userId')
+
+      table.foreign('teamId').references('id').inTable('team')
+    })
 }
 
 exports.down = knex => {

@@ -1,22 +1,22 @@
 type Query {
     tags: [Tag!]!
-    tagById(id: ID!): Tag
-    tagsByIds(ids: [ID!]!): [Tag!]!
+    tagById(id: Int!): Tag
+    tagsByIds(ids: [Int!]!): [Tag!]!
 }
 
 type Mutation {
     createTag(input: TagInput!): Tag
-    updateTag(id: ID!, input: TagInput!): Tag
+    updateTag(id: Int!, input: TagInput!): Tag
 }
 
 type Tag {
-    id: ID!
+    id: Int!
     name: String!
     description: String
 }
 
 input TagInput {
-    id: ID
+    id: Int
     name: String
     description: String
 }

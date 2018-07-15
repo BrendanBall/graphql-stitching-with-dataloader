@@ -1,18 +1,19 @@
 type Query {
     users: [User!]!
-    userById(id: ID!): User
-    usersByIds(ids: [ID!]!): [User!]!
+    userById(id: Int!): User
+    usersByIds(ids: [Int!]!): [User!]!
 }
 
 type Mutation {
     createUser(input: UserInput!): User
-    updateUser(id: ID!, input: UserInput!): User
+    updateUser(id: Int!, input: UserInput!): User
 }
 
 type User {
-    id: ID!
+    id: Int!
     username: String
     name: String
+    teamId: Int
 }
 
 input UserInput {

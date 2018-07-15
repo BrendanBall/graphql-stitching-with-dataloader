@@ -9,8 +9,8 @@ export async function tagById (obj, { id }, { knex }, info) {
 }
 
 export async function tagsByIds (obj, { ids }, { knex }, info) {
-  console.log('tagsByIds for: ', ids)
-  return Tag.query(knex).findByIds(ids).throwIfNotFound()
+  let tags = await Tag.query(knex).findByIds(ids).throwIfNotFound()
+  return ids.map(id => tags.find(u => u.id === id))
 }
 
 export async function createTag (obj, { input }, { knex }, info) {

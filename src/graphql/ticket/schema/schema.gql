@@ -4,26 +4,26 @@ type Query {
 
 type Mutation {
     createTicket(input: TicketInput!): Ticket
-    updateTicket(id: ID!, input: TicketInput!): Ticket
+    updateTicket(id: Int!, input: TicketInput!): Ticket
 }
 
 scalar DateTime
 
 type Ticket {
-    id: ID!
+    id: Int!
     title: String
     description: String
     createdAt: DateTime!
     modifiedAt: DateTime
-    createdByUserId: ID!
-    assignedToUserId: ID
-    tagIds: [ID!]!
+    createdByUserId: Int!
+    assignedToUserId: Int
+    tagIds: [Int!]!
 }
 
 input TicketInput {
     title: String!
     description: String!
-    createdByUserId: ID!
-    assignedToUserId: ID
-    tagIds: [ID!]
+    createdByUserId: Int!
+    assignedToUserId: Int
+    tagIds: [Int!]
 }
