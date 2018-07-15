@@ -15,7 +15,7 @@ const linkTypeDefs = `
   }
 
   extend type Team {
-    users: [User!]!
+    users: [User!]
   }
 
   extend type User {
@@ -27,19 +27,19 @@ const userBinding = new Binding({ schema: userSchema })
 const teamBinding = new Binding({ schema: teamSchema })
 
 function userLoader () {
-  return new SmartDataLoader(async (ids, selectionSet) => {
-    console.log('user loader : ', printSelectionSet(selectionSet), '-- ids: ', ids)
-    let resp = await userBinding.query.usersByIds({ ids }, printSelectionSet(selectionSet))
+  return new SmartDataLoader(async (ids, info) => {
+    console.log('user loader : ', printSelectionSet(info.fieldNodes[0].selectionSet), '-- ids: ', ids)
+    let resp = await userBinding.query.usersByIds({ ids }, info)
     console.log('userBinding resp: ', resp)
     return resp
   })
 }
 
 function teamByUserIdLoader () {
-  return new SmartDataLoader(async (userIds, selectionSet) => {
-    console.log('teamByUserId loader : ', printSelectionSet(selectionSet), '-- userIds: ', userIds)
-    let resp = await teamBinding.query.usersByIds({ userIds }, printSelectionSet(selectionSet))
-    console.log('teamBinding resp: ', resp)
+  return new SmartDataLoader(async (userIds, info) => {
+    console.log('teamByUserId loader : ', printSelectionSet(info.fieldNodes[0].selectionSet), '-- userIds: ', userIds)
+    let resp = await teamBinding.query.teamsByUserIds({ userIds }, info)
+    console.log('teamBinding resp: ', JSON.stringify(resp))
     return resp
   })
 }
@@ -47,14 +47,14 @@ function teamByUserIdLoader () {
 const ticketCreatedBy = {
   fragment: `... on Ticket { createdByUserId }`,
   async resolve (ticket, args, { loaders: { user } }, info) {
-    return user.load(ticket.createdByUserId, info.fieldNodes[0].selectionSet)
+    return user.load(ticket.createdByUserId, info)
   }
 }
 
 const ticketAssignedTo = {
   fragment: `... on Ticket { assignedToUserId }`,
   async resolve (ticket, args, { loaders: { user } }, info) {
-    return user.load(ticket.assignedToUserId, info.fieldNodes[0].selectionSet)
+    return user.load(ticket.assignedToUserId, info)
   }
 }
 
@@ -62,7 +62,7 @@ const team = {
   users: {
     fragment: `... on Team { userIds }`,
     async resolve (team, args, { loaders: { user } }, info) {
-      return user.loadMany(team.userIds, info.fieldNodes[0].selectionSet)
+      return user.loadMany(team.userIds, info)
     }
   }
 }
@@ -71,7 +71,7 @@ const user = {
   team: {
     fragment: `... on User { id }`,
     async resolve (user, args, { loaders: { teamByUserId } }, info) {
-      return teamByUserId.load(user.id, info.fieldNodes[0].selectionSet)
+      return teamByUserId.load(user.id, info)
     }
   }
 }

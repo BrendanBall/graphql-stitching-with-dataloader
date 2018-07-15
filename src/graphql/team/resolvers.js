@@ -4,7 +4,9 @@ import DataLoader from 'dataloader'
 import { print } from 'graphql'
 
 export async function teams (obj, args, { knex }, info) {
-  return Team.query(knex)
+  let resp = await Team.query(knex)
+  console.log('teams: ', resp)
+  return resp
 }
 
 export async function teamById (obj, { id }, { knex }, info) {
@@ -13,8 +15,11 @@ export async function teamById (obj, { id }, { knex }, info) {
 }
 
 export async function teamsByUserIds (obj, { userIds }, { knex }, info) {
-  let teams = await Team.query(knex).findByIds(userIds).throwIfNotFound()
-  return userIds.map(userId => teams.find(u => u.userId === userId))
+  console.log('in query: ', print(info.fieldNodes[0]).replace(/\s+/g, ' '), '-- userIds:', userIds)
+  let users = await TeamUser.query(knex).eager('team').whereIn('userId', userIds)
+  let resp = userIds.map(userId => users.find(u => u.userId === userId).team)
+  console.log('teamsByUserIds: ', resp)
+  return resp
 }
 
 export async function teamsByIds (obj, { ids }, { knex }, info) {
@@ -31,8 +36,9 @@ export async function updateTeam (obj, { id, input }, { knex }, info) {
 }
 
 export const TeamResolver = {
-  async userIds (team, args, { loaders: { teamUserIds } }, info) {
-    return teamUserIds.load(team.id)
+  async userIds (team, args, ctx, info) {
+    console.log('loading team userIds for team: ', team.id)
+    return ctx.loaders.teamUserIds.load(team.id)
   }
 }
 
@@ -51,7 +57,8 @@ export default {
   Query: {
     teams,
     teamById,
-    teamsByIds
+    teamsByIds,
+    teamsByUserIds
   },
   Mutation: {
     createTeam,

@@ -35,7 +35,7 @@ exports.up = knex => {
     })
     .createTable('teamUser', table => {
       table.integer('teamId')
-      table.integer('userId')
+      table.integer('userId').unique()
 
       table.foreign('teamId').references('id').inTable('team')
     })
